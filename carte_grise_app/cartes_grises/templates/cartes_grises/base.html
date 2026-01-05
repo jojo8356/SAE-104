@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion Carte Grise{% endblock %} - SAE 1.04</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="h-full">
+    <div class="min-h-full">
+        <!-- Navigation -->
+        <nav class="bg-indigo-600">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex h-16 items-center justify-between">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-id-card text-white text-2xl"></i>
+                        </div>
+                        <div class="hidden md:block">
+                            <div class="ml-10 flex items-baseline space-x-4">
+                                <a href="{% url 'index' %}" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">
+                                    <i class="fas fa-home mr-1"></i> Accueil
+                                </a>
+                                <a href="{% url 'liste_cartes_grises' %}" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">
+                                    <i class="fas fa-list mr-1"></i> Cartes Grises
+                                </a>
+                                <a href="{% url 'ajouter_carte_grise' %}" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">
+                                    <i class="fas fa-plus mr-1"></i> Ajouter
+                                </a>
+                                <a href="{% url 'statistiques' %}" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">
+                                    <i class="fas fa-chart-bar mr-1"></i> Statistiques
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hidden md:block">
+                        <span class="text-white text-sm">SAE 1.04 - BUT Informatique</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Messages Flash -->
+        {% if messages %}
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 mt-4">
+                {% for message in messages %}
+                    <div class="rounded-md p-4 mb-4 {% if message.tags == 'success' %}bg-green-50 border-green-400{% elif message.tags == 'error' %}bg-red-50 border-red-400{% else %}bg-blue-50 border-blue-400{% endif %} border-l-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas {% if message.tags == 'success' %}fa-check-circle text-green-400{% elif message.tags == 'error' %}fa-exclamation-circle text-red-400{% else %}fa-info-circle text-blue-400{% endif %}"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm {% if message.tags == 'success' %}text-green-700{% elif message.tags == 'error' %}text-red-700{% else %}text-blue-700{% endif %}">
+                                    {{ message }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Contenu principal -->
+        <main>
+            <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-12">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+                <p class="text-center text-sm text-gray-500">
+                    © 2026 SAE 1.04 - Création d'une base de données | BUT Informatique | IUT Nice Côte d'Azur
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

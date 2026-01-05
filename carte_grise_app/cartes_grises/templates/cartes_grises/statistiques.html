@@ -1,0 +1,366 @@
+{% extends "cartes_grises/base.html" %}
+
+{% block title %}Statistiques{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center mb-6">
+        <div class="sm:flex-auto">
+            <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                <i class="fas fa-chart-bar mr-2 text-purple-600"></i>
+                Statistiques
+            </h1>
+            <p class="mt-2 text-sm text-gray-700">
+                Vue d'ensemble des données de la base de cartes grises
+            </p>
+        </div>
+    </div>
+
+    <!-- Vue d'ensemble -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-id-card text-3xl text-indigo-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Cartes Grises</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ total_cartes }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-car text-3xl text-green-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Véhicules</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ total_vehicules }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users text-3xl text-purple-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Propriétaires</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ total_proprietaires }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-tools text-3xl text-orange-600"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Total Contrôles</dt>
+                            <dd class="text-2xl font-semibold text-gray-900">{{ total_controles }}</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par marque -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-trademark mr-2 text-indigo-600"></i>
+                Répartition par Marque
+            </h3>
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-300">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                Marque
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Nombre de véhicules
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Pourcentage
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for stat in stats_marques %}
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                {{ stat.marque }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {{ stat.count }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <div class="flex items-center">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2" style="max-width: 200px;">
+                                        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: {{ stat.percentage }}%"></div>
+                                    </div>
+                                    <span>{{ stat.percentage|floatformat:1 }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par année -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-calendar-alt mr-2 text-green-600"></i>
+                Immatriculations par Année
+            </h3>
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-300">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                Année
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Nombre d'immatriculations
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Évolution
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for stat in stats_annees %}
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                {{ stat.annee }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {{ stat.count }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <div class="w-full bg-gray-200 rounded-full h-2.5" style="max-width: 200px;">
+                                    <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ stat.percentage }}%"></div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Véhicules polluants -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-smog mr-2 text-red-600"></i>
+                Véhicules Polluants (Classe 0-2)
+            </h3>
+            <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-300">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                Classe Crit'Air
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Nombre de véhicules
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Pourcentage
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for stat in stats_pollution %}
+                        <tr>
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if stat.classe == '0' %}bg-green-100 text-green-800
+                                    {% elif stat.classe == '1' %}bg-purple-100 text-purple-800
+                                    {% elif stat.classe == '2' %}bg-yellow-100 text-yellow-800
+                                    {% endif %}">
+                                    Crit'Air {{ stat.classe }}
+                                </span>
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {{ stat.count }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <div class="flex items-center">
+                                    <div class="w-full bg-gray-200 rounded-full h-2.5 mr-2" style="max-width: 200px;">
+                                        <div class="bg-red-600 h-2.5 rounded-full" style="width: {{ stat.percentage }}%"></div>
+                                    </div>
+                                    <span>{{ stat.percentage|floatformat:1 }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques par catégorie de permis -->
+    <div class="bg-white shadow rounded-lg mb-8">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-id-badge mr-2 text-blue-600"></i>
+                Répartition par Catégorie de Permis
+            </h3>
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                {% for stat in stats_permis %}
+                <div class="bg-gray-50 rounded-lg p-4 text-center">
+                    <div class="text-3xl font-bold text-indigo-600">{{ stat.count }}</div>
+                    <div class="text-sm text-gray-500 mt-1">Permis {{ stat.permis }}</div>
+                    <div class="text-xs text-gray-400 mt-1">{{ stat.percentage|floatformat:1 }}%</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- e. Requête avancée: Véhicules > X années + émission CO2 > Y -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-search-plus mr-2 text-orange-600"></i>
+                Recherche Avancée: Véhicules Anciens + Polluants
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">
+                Trouvez les véhicules qui ont plus de X années ET une émission de CO2 supérieure à Y g/km
+            </p>
+
+            <!-- Formulaire de recherche -->
+            <form method="get" class="mb-6">
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <div class="sm:col-span-1">
+                        <label for="annees_min" class="block text-sm font-medium text-gray-700">
+                            Âge minimum (années)
+                        </label>
+                        <input type="number" name="annees_min" id="annees_min" value="{{ annees_min }}"
+                               placeholder="Ex: 4" min="0" max="50"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-3 py-2 border">
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label for="emission_min" class="block text-sm font-medium text-gray-700">
+                            Émission CO2 min (g/km)
+                        </label>
+                        <input type="number" name="emission_min" id="emission_min" value="{{ emission_min }}"
+                               placeholder="Ex: 120" min="0" max="500"
+                               class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500 sm:text-sm px-3 py-2 border">
+                    </div>
+                    <div class="sm:col-span-1 flex items-end">
+                        <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-orange-600 hover:bg-orange-700">
+                            <i class="fas fa-filter mr-2"></i> Filtrer
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Résultats -->
+            {% if vehicules_anciens_polluants %}
+            <div class="mb-4 p-4 bg-orange-50 border border-orange-200 rounded-md">
+                <p class="text-sm text-orange-800">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    <strong>{{ count_anciens_polluants }}</strong> véhicule(s) trouvé(s)
+                    {% if annees_min %}avec plus de {{ annees_min }} ans{% endif %}
+                    {% if emission_min %}et émission CO2 > {{ emission_min }} g/km{% endif %}
+                </p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-300">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">
+                                Marque / Modèle
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                N° Série
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Date Fabrication
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                Âge (ans)
+                            </th>
+                            <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
+                                CO2 (g/km)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        {% for vehicule in vehicules_anciens_polluants %}
+                        <tr class="hover:bg-gray-50">
+                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                {{ vehicule.marque }} {{ vehicule.modele }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500 font-mono">
+                                {{ vehicule.num_serie }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                {{ vehicule.date_fabrication|date:"d/m/Y" }}
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if vehicule.age >= 10 %}bg-red-100 text-red-800
+                                    {% elif vehicule.age >= 5 %}bg-orange-100 text-orange-800
+                                    {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                    {{ vehicule.age }} ans
+                                </span>
+                            </td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                                    {% if vehicule.emission_co2 >= 150 %}bg-red-100 text-red-800
+                                    {% elif vehicule.emission_co2 >= 100 %}bg-orange-100 text-orange-800
+                                    {% else %}bg-green-100 text-green-800{% endif %}">
+                                    {{ vehicule.emission_co2 }} g/km
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% elif annees_min or emission_min %}
+            <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-inbox text-4xl text-gray-300 mb-3 block"></i>
+                <p>Aucun véhicule ne correspond aux critères</p>
+            </div>
+            {% else %}
+            <div class="text-center py-8 text-gray-400">
+                <i class="fas fa-search text-4xl text-gray-300 mb-3 block"></i>
+                <p>Saisissez des critères pour lancer la recherche</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,133 @@
+{% extends "cartes_grises/base.html" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <!-- Hero Section -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl">
+            <i class="fas fa-id-card text-indigo-600"></i>
+            Gestion des Cartes Grises
+        </h1>
+        <p class="mt-4 text-lg leading-8 text-gray-600">
+            Système de gestion et de suivi des cartes grises - SAE 1.04
+        </p>
+    </div>
+
+    <!-- Statistiques Cards -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 mb-12">
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-id-card h-10 w-10 text-indigo-600 text-3xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Cartes Grises</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ total_cartes }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-car h-10 w-10 text-green-600 text-3xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Véhicules</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ total_vehicules }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users h-10 w-10 text-blue-600 text-3xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Propriétaires</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ total_proprietaires }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white overflow-hidden shadow rounded-lg">
+            <div class="p-5">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-tools h-10 w-10 text-orange-600 text-3xl"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate">Contrôles Techniques</dt>
+                            <dd class="flex items-baseline">
+                                <div class="text-2xl font-semibold text-gray-900">{{ total_controles }}</div>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                <i class="fas fa-bolt mr-2 text-yellow-500"></i>
+                Actions Rapides
+            </h3>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <a href="{% url 'ajouter_carte_grise' %}" class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-6 text-center hover:border-indigo-500 transition">
+                    <i class="fas fa-plus-circle text-4xl text-indigo-600 mb-2"></i>
+                    <span class="mt-2 block text-sm font-medium text-gray-900">Ajouter une carte grise</span>
+                </a>
+
+                <a href="{% url 'liste_cartes_grises' %}" class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-6 text-center hover:border-green-500 transition">
+                    <i class="fas fa-search text-4xl text-green-600 mb-2"></i>
+                    <span class="mt-2 block text-sm font-medium text-gray-900">Rechercher une carte</span>
+                </a>
+
+                <a href="{% url 'statistiques' %}" class="relative block w-full rounded-lg border-2 border-dashed border-gray-300 p-6 text-center hover:border-blue-500 transition">
+                    <i class="fas fa-chart-pie text-4xl text-blue-600 mb-2"></i>
+                    <span class="mt-2 block text-sm font-medium text-gray-900">Voir les statistiques</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Informations du projet -->
+    <div class="mt-12 bg-indigo-50 border border-indigo-200 rounded-lg p-6">
+        <h3 class="text-lg font-medium text-indigo-900 mb-3">
+            <i class="fas fa-info-circle mr-2"></i>
+            À propos du projet
+        </h3>
+        <p class="text-indigo-700 mb-2">
+            <strong>SAE 1.04 :</strong> Création d'une base de données relationnelle pour la gestion des cartes grises
+        </p>
+        <p class="text-indigo-700">
+            <strong>Technologies :</strong> MySQL, Django 5.2, Python 3.11, Tailwind CSS
+        </p>
+    </div>
+</div>
+{% endblock %}

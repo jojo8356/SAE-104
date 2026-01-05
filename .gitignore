@@ -1,0 +1,35 @@
+# Environnement virtuel Python (uv)
+carte_grise_app/.venv/
+.venv/
+venv/
+env/
+
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Fichiers temporaires
+*.tmp
+*.bak

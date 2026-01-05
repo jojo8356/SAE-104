@@ -1,0 +1,110 @@
+{% extends "cartes_grises/base.html" %}
+
+{% block title %}Ajouter une Carte Grise{% endblock %}
+
+{% block content %}
+<div class="px-4 sm:px-6 lg:px-8">
+    <div class="sm:flex sm:items-center">
+        <div class="sm:flex-auto">
+            <h1 class="text-3xl font-bold leading-tight tracking-tight text-gray-900">
+                <i class="fas fa-plus-circle mr-2 text-indigo-600"></i>
+                Ajouter une Carte Grise
+            </h1>
+            <p class="mt-2 text-sm text-gray-700">
+                Créez une nouvelle carte grise. Les numéros seront générés automatiquement.
+            </p>
+        </div>
+    </div>
+
+    <div class="mt-8 max-w-3xl">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <!-- Informations générées automatiquement -->
+            <div class="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                <h3 class="text-sm font-medium text-indigo-900 mb-3">
+                    <i class="fas fa-robot mr-1"></i> Numéros générés automatiquement
+                </h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="block text-xs text-indigo-700">Numéro de carte grise</span>
+                        <span class="block text-sm font-mono font-bold text-indigo-900">{{ prochain_num_carte }}</span>
+                    </div>
+                    <div>
+                        <span class="block text-xs text-indigo-700">Numéro d'immatriculation</span>
+                        <span class="block text-sm font-mono font-bold text-indigo-900">{{ prochain_num_immat }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sélection du propriétaire -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <i class="fas fa-user mr-2 text-blue-600"></i>
+                    Propriétaire
+                </h3>
+                <div>
+                    <label for="id_proprio" class="block text-sm font-medium text-gray-700">
+                        Sélectionner le propriétaire <span class="text-red-500">*</span>
+                    </label>
+                    <select id="id_proprio" name="id_proprio" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                        <option value="">-- Choisir un propriétaire --</option>
+                        {% for proprio in proprietaires %}
+                        <option value="{{ proprio.id_proprio }}">
+                            {{ proprio.nom }} {{ proprio.prenoms }} - {{ proprio.adresse }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Sélection du véhicule -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <i class="fas fa-car mr-2 text-green-600"></i>
+                    Véhicule
+                </h3>
+                <div>
+                    <label for="id_vehicule" class="block text-sm font-medium text-gray-700">
+                        Sélectionner le véhicule <span class="text-red-500">*</span>
+                    </label>
+                    <select id="id_vehicule" name="id_vehicule" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 border">
+                        <option value="">-- Choisir un véhicule --</option>
+                        {% for vehicule in vehicules %}
+                        <option value="{{ vehicule.id_vehicule }}">
+                            {{ vehicule.id_modele }} ({{ vehicule.date_fabrication.year }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">
+                    <i class="fas fa-cog mr-2 text-gray-600"></i>
+                    Options
+                </h3>
+                <div class="flex items-center">
+                    <input id="conducteur_est_proprietaire" name="conducteur_est_proprietaire" type="checkbox" checked class="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                    <label for="conducteur_est_proprietaire" class="ml-2 block text-sm text-gray-900">
+                        Le conducteur est le propriétaire
+                    </label>
+                </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="flex gap-3 justify-end">
+                <a href="{% url 'liste_cartes_grises' %}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    <i class="fas fa-times mr-2"></i>
+                    Annuler
+                </a>
+                <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                    <i class="fas fa-save mr-2"></i>
+                    Créer la carte grise
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
