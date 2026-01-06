@@ -71,9 +71,40 @@ else
 fi
 
 # ============================================
-# 3. Créer la base de données
+# 3. Vérifier et installer/démarrer MariaDB
 # ============================================
-echo -e "${YELLOW}[3/8]${NC} Création de la base de données..."
+echo -e "${YELLOW}[3/9]${NC} Vérification de MariaDB..."
+if ! command -v mysql &> /dev/null; then
+    echo -e "${YELLOW}MariaDB n'est pas installé. Installation en cours...${NC}"
+    sudo apt-get update && sudo apt-get install -y mariadb-server
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} MariaDB installé avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de l'installation de MariaDB"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓${NC} MariaDB est déjà installé"
+fi
+
+# Démarrer MariaDB s'il n'est pas en cours d'exécution
+if ! sudo systemctl is-active --quiet mariadb 2>/dev/null && ! sudo service mariadb status &>/dev/null; then
+    echo -e "${YELLOW}Démarrage de MariaDB...${NC}"
+    sudo systemctl start mariadb 2>/dev/null || sudo service mariadb start
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} MariaDB démarré avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors du démarrage de MariaDB"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓${NC} MariaDB est en cours d'exécution"
+fi
+
+# ============================================
+# 4. Créer la base de données
+# ============================================
+echo -e "${YELLOW}[4/9]${NC} Création de la base de données..."
 sudo mysql -u root -e "DROP DATABASE IF EXISTS carte_grise_db;" 2>/dev/null
 sudo mysql -u root -e "CREATE DATABASE carte_grise_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 if [ $? -eq 0 ]; then
@@ -84,9 +115,9 @@ else
 fi
 
 # ============================================
-# 4. Créer les tables
+# 5. Créer les tables
 # ============================================
-echo -e "\n${YELLOW}[4/8]${NC} Création des tables..."
+echo -e "\n${YELLOW}[5/9]${NC} Création des tables..."
 sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/create_tables.sql"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} Tables créées avec succès"
@@ -96,9 +127,9 @@ else
 fi
 
 # ============================================
-# 5. Insérer les données de test
+# 6. Insérer les données de test
 # ============================================
-echo -e "\n${YELLOW}[5/8]${NC} Insertion des données de test..."
+echo -e "\n${YELLOW}[6/9]${NC} Insertion des données de test..."
 sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/insert_data.sql"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} Données insérées avec succès"
@@ -108,9 +139,9 @@ else
 fi
 
 # ============================================
-# 6. Créer l'utilisateur Django
+# 7. Créer l'utilisateur Django
 # ============================================
-echo -e "\n${YELLOW}[6/8]${NC} Création de l'utilisateur Django..."
+echo -e "\n${YELLOW}[7/9]${NC} Création de l'utilisateur Django..."
 sudo mysql -u root -e "DROP USER IF EXISTS 'django_user'@'localhost';" 2>/dev/null
 sudo mysql -u root -e "CREATE USER 'django_user'@'localhost' IDENTIFIED BY 'django_password';"
 sudo mysql -u root -e "GRANT ALL PRIVILEGES ON carte_grise_db.* TO 'django_user'@'localhost';"
@@ -126,9 +157,9 @@ else
 fi
 
 # ============================================
-# 7. Installer les dépendances Python
+# 8. Installer les dépendances Python
 # ============================================
-echo -e "\n${YELLOW}[7/8]${NC} Installation des dépendances Python avec uv..."
+echo -e "\n${YELLOW}[8/9]${NC} Installation des dépendances Python avec uv..."
 cd "$(dirname "$0")/carte_grise_app"
 uv sync
 if [ $? -eq 0 ]; then
@@ -140,9 +171,9 @@ fi
 cd ..
 
 # ============================================
-# 8. Afficher un résumé
+# 9. Afficher un résumé
 # ============================================
-echo -e "\n${YELLOW}[8/8]${NC} Vérification de l'installation..."
+echo -e "\n${YELLOW}[9/9]${NC} Vérification de l'installation..."
 echo -e "\n${BLUE}Résumé des données insérées :${NC}"
 sudo mysql -u root carte_grise_db -e "
 SELECT
