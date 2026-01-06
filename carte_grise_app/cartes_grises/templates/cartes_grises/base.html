@@ -17,6 +17,7 @@
                         <div class="flex-shrink-0">
                             <i class="fas fa-id-card text-white text-2xl"></i>
                         </div>
+                        <!-- Menu desktop -->
                         <div class="hidden md:block">
                             <div class="ml-10 flex items-baseline space-x-4">
                                 <a href="{% url 'index' %}" class="text-white hover:bg-indigo-700 px-3 py-2 rounded-md text-sm font-medium">
@@ -37,9 +38,56 @@
                     <div class="hidden md:block">
                         <span class="text-white text-sm">SAE 1.04 - BUT Informatique</span>
                     </div>
+                    <!-- Bouton hamburger mobile -->
+                    <div class="md:hidden">
+                        <button type="button" id="mobile-menu-button" class="inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-indigo-600" aria-controls="mobile-menu" aria-expanded="false">
+                            <span class="sr-only">Ouvrir le menu</span>
+                            <!-- Icone hamburger -->
+                            <i class="fas fa-bars text-xl" id="menu-icon-open"></i>
+                            <!-- Icone fermer (cachée par défaut) -->
+                            <i class="fas fa-times text-xl hidden" id="menu-icon-close"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Menu mobile (caché par défaut) -->
+            <div class="hidden md:hidden" id="mobile-menu">
+                <div class="space-y-1 px-2 pb-3 pt-2">
+                    <a href="{% url 'index' %}" class="text-white hover:bg-indigo-700 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-home mr-2"></i> Accueil
+                    </a>
+                    <a href="{% url 'liste_cartes_grises' %}" class="text-white hover:bg-indigo-700 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-list mr-2"></i> Cartes Grises
+                    </a>
+                    <a href="{% url 'ajouter_carte_grise' %}" class="text-white hover:bg-indigo-700 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-plus mr-2"></i> Ajouter
+                    </a>
+                    <a href="{% url 'statistiques' %}" class="text-white hover:bg-indigo-700 block px-3 py-2 rounded-md text-base font-medium">
+                        <i class="fas fa-chart-bar mr-2"></i> Statistiques
+                    </a>
+                    <div class="border-t border-indigo-500 mt-2 pt-2">
+                        <span class="text-indigo-200 block px-3 py-2 text-sm">SAE 1.04 - BUT Informatique</span>
+                    </div>
                 </div>
             </div>
         </nav>
+
+        <!-- Script pour le menu mobile -->
+        <script>
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const iconOpen = document.getElementById('menu-icon-open');
+                const iconClose = document.getElementById('menu-icon-close');
+
+                mobileMenu.classList.toggle('hidden');
+                iconOpen.classList.toggle('hidden');
+                iconClose.classList.toggle('hidden');
+
+                const isExpanded = !mobileMenu.classList.contains('hidden');
+                this.setAttribute('aria-expanded', isExpanded);
+            });
+        </script>
 
         <!-- Messages Flash -->
         {% if messages %}
