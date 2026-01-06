@@ -71,20 +71,67 @@ else
 fi
 
 # ============================================
-# 3. Vérifier et installer/démarrer MariaDB
+# 3. Vérifier et installer/démarrer MariaDB 10.5+
 # ============================================
 echo -e "${YELLOW}[3/9]${NC} Vérification de MariaDB..."
+
+# Fonction pour obtenir la version majeure de MariaDB
+get_mariadb_version() {
+    mysql --version 2>/dev/null | grep -oP 'MariaDB.*?(\d+\.\d+)' | grep -oP '\d+\.\d+' | head -1
+}
+
+# Vérifier si MariaDB est installé et si la version est >= 10.5
+install_mariadb=false
 if ! command -v mysql &> /dev/null; then
-    echo -e "${YELLOW}MariaDB n'est pas installé. Installation en cours...${NC}"
-    sudo apt-get update && sudo apt-get install -y mariadb-server
+    install_mariadb=true
+    echo -e "${YELLOW}MariaDB n'est pas installé.${NC}"
+else
+    mariadb_version=$(get_mariadb_version)
+    mariadb_major=$(echo "$mariadb_version" | cut -d. -f1)
+    mariadb_minor=$(echo "$mariadb_version" | cut -d. -f2)
+    if [ "$mariadb_major" -lt 10 ] || ([ "$mariadb_major" -eq 10 ] && [ "$mariadb_minor" -lt 5 ]); then
+        echo -e "${YELLOW}MariaDB $mariadb_version détecté, version 10.5+ requise. Mise à jour...${NC}"
+        # Arrêter MariaDB avant la mise à jour
+        sudo systemctl stop mariadb 2>/dev/null || sudo service mariadb stop 2>/dev/null
+        install_mariadb=true
+    else
+        echo -e "${GREEN}✓${NC} MariaDB $mariadb_version est déjà installé"
+    fi
+fi
+
+if [ "$install_mariadb" = true ]; then
+    echo -e "${YELLOW}Installation de MariaDB 10.11 (LTS) depuis le dépôt officiel...${NC}"
+
+    # Installer les dépendances nécessaires
+    sudo apt-get update
+    sudo apt-get install -y apt-transport-https gnupg
+
+    # Ajouter la clé GPG de MariaDB
+    curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /usr/share/keyrings/mariadb-keyring.gpg 2>/dev/null || true
+
+    # Détecter la distribution Debian/Ubuntu
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        DISTRO=$ID
+        CODENAME=$VERSION_CODENAME
+    else
+        DISTRO="debian"
+        CODENAME="bookworm"
+    fi
+
+    # Ajouter le dépôt MariaDB 10.11 LTS
+    echo "deb [signed-by=/usr/share/keyrings/mariadb-keyring.gpg] https://mirrors.ircam.fr/pub/mariadb/repo/10.11/$DISTRO $CODENAME main" | sudo tee /etc/apt/sources.list.d/mariadb.list > /dev/null
+
+    # Mettre à jour et installer MariaDB
+    sudo apt-get update
+    sudo apt-get install -y mariadb-server mariadb-client
+
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓${NC} MariaDB installé avec succès"
+        echo -e "${GREEN}✓${NC} MariaDB 10.11 installé avec succès"
     else
         echo -e "${RED}✗${NC} Erreur lors de l'installation de MariaDB"
         exit 1
     fi
-else
-    echo -e "${GREEN}✓${NC} MariaDB est déjà installé"
 fi
 
 # Démarrer MariaDB s'il n'est pas en cours d'exécution
