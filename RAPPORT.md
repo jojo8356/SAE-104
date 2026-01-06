@@ -94,11 +94,13 @@ L'application permet de gérer l'ensemble du cycle de vie des cartes grises :
 
 ### 2.3 Répartition des tâches
 
-**Note** : Ce projet a été réalisé individuellement.
-
 | Membre      | Tâches                | Pourcentage |
 | ----------- | --------------------- | ----------- |
-| [Votre nom] | Toutes les étapes 1-9 | 100%        |
+| Johan Polsinelli | étapes de 1-4 | 50%        |
+| Iryna Bastryha | le reste des étapes (1/8) | 12.5%        |
+| Rafael Eck | le reste des étapes (1/8) | 12.5%        |
+| Anthony Deblieux | le reste des étapes (1/8) | 12.5%        |
+| Alexandru Zupcau | le reste des étapes (1/8) | 12.5%        |
 
 **Détail du travail accompli** :
 
@@ -367,10 +369,10 @@ Carte_Grise (1,*) ──> Controle_Technique
 
 **Avantages** :
 
-- 📉 Économie d'espace (INT vs VARCHAR)
-- 🔒 Intégrité garantie (pas de fautes de frappe)
-- ⚡ Performances (jointures sur INT)
-- 🔧 Maintenance facilitée (1 seul point de modification)
+- Économie d'espace (INT vs VARCHAR)
+- Intégrité garantie (pas de fautes de frappe)
+- Performances (jointures sur INT)
+- Maintenance facilitée (1 seul point de modification)
 
 ### 3.3 Travail technique par étape
 
@@ -847,10 +849,10 @@ class TestVehiculesAnciensPolluants(CarteGriseViewsTestCase):
 
 **Avantages des tests backend** :
 
-- ⚡ **10x plus rapides** que Selenium (12s vs 105s)
-- 🎯 **Plus fiables** (pas de timeouts WebDriver)
-- 🔧 **Plus faciles à déboguer**
-- 📊 **Meilleure couverture** du code
+- **10x plus rapides** que Selenium (12s vs 105s)
+- **Plus fiables** (pas de timeouts WebDriver)
+- **Plus faciles à déboguer**
+- **Meilleure couverture** du code
 
 ### 3.5 Scripts d'automatisation
 
@@ -893,7 +895,7 @@ TOTAL: 62 vérifications | 100% de réussite
 
 ### 4.1 Travail accompli
 
-#### ✅ Fonctionnalités complètes (9/9 étapes)
+#### Fonctionnalités complètes (9/9 étapes)
 
 | Étape | Description          | Statut  | Détails                     |
 | ----- | -------------------- | ------- | --------------------------- |
@@ -907,27 +909,13 @@ TOTAL: 62 vérifications | 100% de réussite
 | 9e    | Véhicules anciens    | ✅ 100% | Âge + CO2 combinés          |
 | Tests | Couverture complète  | ✅ 100% | 43 tests (62 vérifications) |
 
-#### 📊 Statistiques du projet
+#### Statistiques du projet
 
 **Code source** :
 
-- **SQL** : 4 fichiers, ~47 000 caractères
-  - create_tables.sql : 235 lignes
-  - insert_data.sql : 320 lignes
-  - test_conformite.sql : 520 lignes
-  - test_incrementation.sql : 380 lignes
-
-- **Python/Django** :
-  - models.py : 200 lignes
-  - views.py : 380 lignes
-  - utils.py : 120 lignes
-  - tests.py : 500 lignes
-  - test_views.py : 500 lignes
-
-- **Templates HTML** : 5 fichiers, ~1500 lignes
-  - index.html, liste.html, statistiques.html, detail.html, formulaire.html
-
-- **Scripts shell** : 5 fichiers, ~500 lignes
+```bash
+cloc .
+```
 
 **Base de données** :
 
@@ -1006,7 +994,7 @@ TOTAL: 62 vérifications | 100% de réussite
 
 ### 4.3 Objectifs atteints
 
-#### 🎯 Objectifs pédagogiques
+#### Objectifs pédagogiques
 
 | Objectif          | Statut | Commentaire                            |
 | ----------------- | ------ | -------------------------------------- |
@@ -1018,7 +1006,7 @@ TOTAL: 62 vérifications | 100% de réussite
 | Documentation     | ✅     | README, RAPPORT, COMPARAISON_MCD_SQL   |
 | Organisation      | ✅     | Structure professionnelle du projet    |
 
-#### 📈 Compétences acquises
+#### Compétences acquises
 
 **Techniques** :
 
@@ -1046,7 +1034,7 @@ TOTAL: 62 vérifications | 100% de réussite
 
 ### 4.4 Difficultés rencontrées
 
-#### 🔧 Problèmes techniques résolus
+#### Problèmes techniques résolus
 
 **1. Gestion des modèles Django avec `managed=False`**
 
@@ -1085,7 +1073,7 @@ with open('../../sql/create_tables.sql') as f:
 
 ### 4.5 Points forts du projet
 
-#### ⭐ Qualités techniques
+#### Qualités techniques
 
 **1. Normalisation excellente (3NF)**
 
@@ -1211,55 +1199,45 @@ Ce projet a été une excellente opportunité de mettre en pratique les connaiss
 
 ## 6. Auto-évaluation
 
-### 6.1 Répartition du travail
-
-**Note** : Projet réalisé **individuellement**.
-
-| Membre      | Travail accompli                                | Pourcentage | Justification                                   |
-| ----------- | ----------------------------------------------- | ----------- | ----------------------------------------------- |
-| [Votre nom] | Conception, développement, tests, documentation | 100%        | Projet individuel - toutes les étapes réalisées |
-
 ### 6.2 Détail du travail par composant
 
-**Conception (15%)** :
+**Conception** :
 
 - Modélisation MCD
 - Définition du schéma relationnel
 - Normalisation 3NF
 - Choix des contraintes
 
-**Base de données SQL (25%)** :
+**Base de données SQL** :
 
 - create_tables.sql (235 lignes)
 - insert_data.sql (320 lignes)
 - Triggers et contraintes
 - Tests de conformité et d'incrémentation
 
-**Application Django (30%)** :
+**Application Django** :
 
 - Configuration et ORM (10%)
 - Vues et logique métier (10%)
 - Templates et interface (10%)
 
-**Tests (15%)** :
+**Tests** :
 
 - Tests SQL de conformité
 - Tests unitaires Python (27 tests)
 - Tests backend Django (16 tests)
 
-**Scripts et automatisation (10%)** :
+**Scripts et automatisation** :
 
 - install.sh
 - test.sh (5 options)
 - migrate.sh, run.sh
 
-**Documentation (5%)** :
+**Documentation** :
 
 - README.md
 - RAPPORT.md
 - COMPARAISON_MCD_SQL.md
-
-**TOTAL : 100%**
 
 ### 6.3 Évaluation de la qualité
 
@@ -1383,15 +1361,3 @@ uv run python manage.py test cartes_grises.test_views --keepdb
 **Tailwind CSS** :
 
 - https://tailwindcss.com/docs
-
-**Git du projet** :
-
-- [À compléter si applicable]
-
----
-
-**Fin du rapport**
-
-_Rapport rédigé le [Date]_
-_SAE 1.04 - BUT Informatique_
-_À rendre avant le 22/01/2026_
