@@ -26,6 +26,8 @@ else
         echo "⚠ Ni Brave ni Chrome détectés, installation de la dernière version de ChromeDriver"
         brave_version="unknown"
         chrome_major="unknown"
+        echo "Installation de brave"
+        curl -fsS https://dl.brave.com/install.sh | sh
     fi
 fi
 
