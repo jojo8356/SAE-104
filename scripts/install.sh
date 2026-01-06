@@ -18,9 +18,26 @@ echo -e "${BLUE}   Base de données Carte Grise${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
 # ============================================
-# 0. Vérifier et installer uv si nécessaire
+# 0. Vérifier et installer curl si nécessaire
 # ============================================
-echo -e "${YELLOW}[0/6]${NC} Vérification de uv..."
+echo -e "${YELLOW}[0/7]${NC} Vérification de curl..."
+if ! command -v curl &> /dev/null; then
+    echo -e "${YELLOW}curl n'est pas installé. Installation en cours...${NC}"
+    sudo apt-get update && sudo apt-get install -y curl
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} curl installé avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de l'installation de curl"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓${NC} curl est déjà installé"
+fi
+
+# ============================================
+# 1. Vérifier et installer uv si nécessaire
+# ============================================
+echo -e "${YELLOW}[1/7]${NC} Vérification de uv..."
 if ! command -v uv &> /dev/null; then
     echo -e "${YELLOW}uv n'est pas installé. Installation en cours...${NC}"
     curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -37,9 +54,9 @@ else
 fi
 
 # ============================================
-# 1. Créer la base de données
+# 2. Créer la base de données
 # ============================================
-echo -e "${YELLOW}[1/6]${NC} Création de la base de données..."
+echo -e "${YELLOW}[2/7]${NC} Création de la base de données..."
 sudo mysql -u root -e "DROP DATABASE IF EXISTS carte_grise_db;" 2>/dev/null
 sudo mysql -u root -e "CREATE DATABASE carte_grise_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 if [ $? -eq 0 ]; then
@@ -50,9 +67,9 @@ else
 fi
 
 # ============================================
-# 2. Créer les tables
+# 3. Créer les tables
 # ============================================
-echo -e "\n${YELLOW}[2/6]${NC} Création des tables..."
+echo -e "\n${YELLOW}[3/7]${NC} Création des tables..."
 sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/create_tables.sql"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} Tables créées avec succès"
@@ -62,9 +79,9 @@ else
 fi
 
 # ============================================
-# 3. Insérer les données de test
+# 4. Insérer les données de test
 # ============================================
-echo -e "\n${YELLOW}[3/6]${NC} Insertion des données de test..."
+echo -e "\n${YELLOW}[4/7]${NC} Insertion des données de test..."
 sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/insert_data.sql"
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} Données insérées avec succès"
@@ -74,9 +91,9 @@ else
 fi
 
 # ============================================
-# 4. Créer l'utilisateur Django
+# 5. Créer l'utilisateur Django
 # ============================================
-echo -e "\n${YELLOW}[4/6]${NC} Création de l'utilisateur Django..."
+echo -e "\n${YELLOW}[5/7]${NC} Création de l'utilisateur Django..."
 sudo mysql -u root -e "DROP USER IF EXISTS 'django_user'@'localhost';" 2>/dev/null
 sudo mysql -u root -e "CREATE USER 'django_user'@'localhost' IDENTIFIED BY 'django_password';"
 sudo mysql -u root -e "GRANT ALL PRIVILEGES ON carte_grise_db.* TO 'django_user'@'localhost';"
@@ -92,9 +109,9 @@ else
 fi
 
 # ============================================
-# 5. Installer les dépendances Python
+# 6. Installer les dépendances Python
 # ============================================
-echo -e "\n${YELLOW}[5/6]${NC} Installation des dépendances Python avec uv..."
+echo -e "\n${YELLOW}[6/7]${NC} Installation des dépendances Python avec uv..."
 cd "$(dirname "$0")/carte_grise_app"
 uv sync
 if [ $? -eq 0 ]; then
@@ -106,9 +123,9 @@ fi
 cd ..
 
 # ============================================
-# 6. Afficher un résumé
+# 7. Afficher un résumé
 # ============================================
-echo -e "\n${YELLOW}[6/6]${NC} Vérification de l'installation..."
+echo -e "\n${YELLOW}[7/7]${NC} Vérification de l'installation..."
 echo -e "\n${BLUE}Résumé des données insérées :${NC}"
 sudo mysql -u root carte_grise_db -e "
 SELECT
