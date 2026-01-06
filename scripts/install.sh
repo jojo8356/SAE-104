@@ -38,13 +38,15 @@ fi
 # 1. Vérifier et installer uv si nécessaire
 # ============================================
 echo -e "${YELLOW}[1/7]${NC} Vérification de uv..."
+# Ajouter le chemin de uv au PATH pour cette session
+export PATH="$HOME/.local/bin:$PATH"
 if ! command -v uv &> /dev/null; then
     echo -e "${YELLOW}uv n'est pas installé. Installation en cours...${NC}"
     curl -LsSf https://astral.sh/uv/install.sh | sh
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓${NC} uv installé avec succès"
-        # Recharger le PATH pour que uv soit disponible
-        export PATH="$HOME/.local/bin:$PATH"
+        # Sourcer l'environnement pour que uv soit disponible immédiatement
+        source "$HOME/.local/bin/env" 2>/dev/null || true
     else
         echo -e "${RED}✗${NC} Erreur lors de l'installation de uv"
         exit 1
