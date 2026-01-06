@@ -160,7 +160,7 @@ fi
 # 8. Installer les dépendances Python
 # ============================================
 echo -e "\n${YELLOW}[8/9]${NC} Installation des dépendances Python avec uv..."
-cd "$(dirname "$0")/carte_grise_app"
+cd "$(dirname "$0")/../carte_grise_app"
 uv sync
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓${NC} Dépendances installées avec succès"

@@ -16,7 +16,7 @@ echo -e "${BLUE}========================================${NC}"
 echo -e "${BLUE}   Migration Django${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
-cd "$(dirname "$0")/carte_grise_app"
+cd "$(dirname "$0")/../carte_grise_app"
 
 echo -e "${YELLOW}Exécution des migrations Django...${NC}\n"
 
