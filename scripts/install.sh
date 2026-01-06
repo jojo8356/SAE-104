@@ -17,13 +17,26 @@ echo -e "${BLUE}   Installation SAE 1.04${NC}"
 echo -e "${BLUE}   Base de données Carte Grise${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
+# Variable pour tracker si apt-get update a été fait
+APT_UPDATED=false
+
+# Fonction pour faire apt-get update une seule fois si nécessaire
+apt_update_once() {
+    if [ "$APT_UPDATED" = false ]; then
+        echo -e "${YELLOW}Mise à jour des dépôts apt...${NC}"
+        sudo apt-get update
+        APT_UPDATED=true
+    fi
+}
+
 # ============================================
 # 0. Vérifier et installer curl si nécessaire
 # ============================================
-echo -e "${YELLOW}[0/7]${NC} Vérification de curl..."
+echo -e "${YELLOW}[0/9]${NC} Vérification de curl..."
 if ! command -v curl &> /dev/null; then
     echo -e "${YELLOW}curl n'est pas installé. Installation en cours...${NC}"
-    sudo apt-get update && sudo apt-get install -y curl
+    apt_update_once
+    sudo apt-get install -y curl
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓${NC} curl installé avec succès"
     else
@@ -37,10 +50,11 @@ fi
 # ============================================
 # 1. Vérifier et installer pip si nécessaire
 # ============================================
-echo -e "${YELLOW}[1/8]${NC} Vérification de pip..."
+echo -e "${YELLOW}[1/9]${NC} Vérification de pip..."
 if ! command -v pip3 &> /dev/null && ! command -v pip &> /dev/null; then
     echo -e "${YELLOW}pip n'est pas installé. Installation en cours...${NC}"
-    sudo apt-get update && sudo apt-get install -y python3-pip
+    apt_update_once
+    sudo apt-get install -y python3-pip
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}✓${NC} pip installé avec succès"
     else
@@ -54,7 +68,7 @@ fi
 # ============================================
 # 2. Vérifier et installer uv si nécessaire
 # ============================================
-echo -e "${YELLOW}[2/8]${NC} Vérification de uv..."
+echo -e "${YELLOW}[2/9]${NC} Vérification de uv..."
 # Ajouter le chemin de uv au PATH pour cette session
 export PATH="$HOME/.local/bin:$PATH"
 if ! command -v uv &> /dev/null; then
@@ -102,12 +116,16 @@ fi
 if [ "$install_mariadb" = true ]; then
     echo -e "${YELLOW}Installation de MariaDB 10.11 (LTS) depuis le dépôt officiel...${NC}"
 
-    # Installer les dépendances nécessaires
-    sudo apt-get update
-    sudo apt-get install -y apt-transport-https gnupg
+    # Vérifier si les dépendances sont déjà installées
+    if ! dpkg -l | grep -q "apt-transport-https" || ! command -v gpg &> /dev/null; then
+        apt_update_once
+        sudo apt-get install -y apt-transport-https gnupg
+    fi
 
-    # Ajouter la clé GPG de MariaDB
-    curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /usr/share/keyrings/mariadb-keyring.gpg 2>/dev/null || true
+    # Ajouter la clé GPG de MariaDB seulement si elle n'existe pas
+    if [ ! -f /usr/share/keyrings/mariadb-keyring.gpg ]; then
+        curl -fsSL https://mariadb.org/mariadb_release_signing_key.pgp | sudo gpg --dearmor -o /usr/share/keyrings/mariadb-keyring.gpg 2>/dev/null || true
+    fi
 
     # Détecter la distribution Debian/Ubuntu
     if [ -f /etc/os-release ]; then
@@ -119,11 +137,14 @@ if [ "$install_mariadb" = true ]; then
         CODENAME="bookworm"
     fi
 
-    # Ajouter le dépôt MariaDB 10.11 LTS
-    echo "deb [signed-by=/usr/share/keyrings/mariadb-keyring.gpg] https://mirrors.ircam.fr/pub/mariadb/repo/10.11/$DISTRO $CODENAME main" | sudo tee /etc/apt/sources.list.d/mariadb.list > /dev/null
+    # Ajouter le dépôt MariaDB 10.11 LTS seulement s'il n'existe pas
+    if [ ! -f /etc/apt/sources.list.d/mariadb.list ]; then
+        echo "deb [signed-by=/usr/share/keyrings/mariadb-keyring.gpg] https://mirrors.ircam.fr/pub/mariadb/repo/10.11/$DISTRO $CODENAME main" | sudo tee /etc/apt/sources.list.d/mariadb.list > /dev/null
+        # Forcer la mise à jour car nouveau dépôt ajouté
+        APT_UPDATED=false
+    fi
 
-    # Mettre à jour et installer MariaDB
-    sudo apt-get update
+    apt_update_once
     sudo apt-get install -y mariadb-server mariadb-client
 
     if [ $? -eq 0 ]; then
@@ -152,55 +173,73 @@ fi
 # 4. Créer la base de données
 # ============================================
 echo -e "${YELLOW}[4/9]${NC} Création de la base de données..."
-sudo mysql -u root -e "DROP DATABASE IF EXISTS carte_grise_db;" 2>/dev/null
-sudo mysql -u root -e "CREATE DATABASE carte_grise_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Base de données créée avec succès"
+# Vérifier si la base existe déjà
+if sudo mysql -u root -e "USE carte_grise_db" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Base de données carte_grise_db existe déjà"
 else
-    echo -e "${RED}✗${NC} Erreur lors de la création de la base de données"
-    exit 1
+    sudo mysql -u root -e "CREATE DATABASE carte_grise_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} Base de données créée avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de la création de la base de données"
+        exit 1
+    fi
 fi
 
 # ============================================
 # 5. Créer les tables
 # ============================================
 echo -e "\n${YELLOW}[5/9]${NC} Création des tables..."
-sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/create_tables.sql"
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Tables créées avec succès"
+# Vérifier si les tables existent déjà
+if sudo mysql -u root carte_grise_db -e "SELECT 1 FROM Fabricant LIMIT 1" 2>/dev/null; then
+    echo -e "${GREEN}✓${NC} Tables déjà créées"
 else
-    echo -e "${RED}✗${NC} Erreur lors de la création des tables"
-    exit 1
+    sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/create_tables.sql"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} Tables créées avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de la création des tables"
+        exit 1
+    fi
 fi
 
 # ============================================
 # 6. Insérer les données de test
 # ============================================
 echo -e "\n${YELLOW}[6/9]${NC} Insertion des données de test..."
-sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/insert_data.sql"
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Données insérées avec succès"
+# Vérifier si les données existent déjà
+nb_fabricants=$(sudo mysql -u root carte_grise_db -N -e "SELECT COUNT(*) FROM Fabricant" 2>/dev/null || echo "0")
+if [ "$nb_fabricants" -gt 0 ]; then
+    echo -e "${GREEN}✓${NC} Données déjà insérées ($nb_fabricants fabricants)"
 else
-    echo -e "${RED}✗${NC} Erreur lors de l'insertion des données"
-    exit 1
+    sudo mysql -u root carte_grise_db < "$(dirname "$0")/../sql/insert_data.sql"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} Données insérées avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de l'insertion des données"
+        exit 1
+    fi
 fi
 
 # ============================================
 # 7. Créer l'utilisateur Django
 # ============================================
 echo -e "\n${YELLOW}[7/9]${NC} Création de l'utilisateur Django..."
-sudo mysql -u root -e "DROP USER IF EXISTS 'django_user'@'localhost';" 2>/dev/null
-sudo mysql -u root -e "CREATE USER 'django_user'@'localhost' IDENTIFIED BY 'django_password';"
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON carte_grise_db.* TO 'django_user'@'localhost';"
-# Donner les permissions pour créer/supprimer des bases de données de test
-sudo mysql -u root -e "GRANT ALL PRIVILEGES ON \`test_carte_grise_db\`.* TO 'django_user'@'localhost';"
-sudo mysql -u root -e "GRANT CREATE, DROP ON *.* TO 'django_user'@'localhost';"
-sudo mysql -u root -e "FLUSH PRIVILEGES;"
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Utilisateur Django créé avec succès (avec permissions de test)"
+# Vérifier si l'utilisateur existe déjà
+if sudo mysql -u root -e "SELECT User FROM mysql.user WHERE User='django_user'" 2>/dev/null | grep -q django_user; then
+    echo -e "${GREEN}✓${NC} Utilisateur django_user existe déjà"
 else
-    echo -e "${RED}✗${NC} Erreur lors de la création de l'utilisateur"
-    exit 1
+    sudo mysql -u root -e "CREATE USER 'django_user'@'localhost' IDENTIFIED BY 'django_password';"
+    sudo mysql -u root -e "GRANT ALL PRIVILEGES ON carte_grise_db.* TO 'django_user'@'localhost';"
+    sudo mysql -u root -e "GRANT ALL PRIVILEGES ON \`test_carte_grise_db\`.* TO 'django_user'@'localhost';"
+    sudo mysql -u root -e "GRANT CREATE, DROP ON *.* TO 'django_user'@'localhost';"
+    sudo mysql -u root -e "FLUSH PRIVILEGES;"
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} Utilisateur Django créé avec succès (avec permissions de test)"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de la création de l'utilisateur"
+        exit 1
+    fi
 fi
 
 # ============================================
@@ -208,12 +247,17 @@ fi
 # ============================================
 echo -e "\n${YELLOW}[8/9]${NC} Installation des dépendances Python avec uv..."
 cd "$(dirname "$0")/../carte_grise_app"
-uv sync
-if [ $? -eq 0 ]; then
-    echo -e "${GREEN}✓${NC} Dépendances installées avec succès"
+# Vérifier si le venv existe déjà et si les dépendances sont installées
+if [ -d ".venv" ] && [ -f ".venv/pyvenv.cfg" ]; then
+    echo -e "${GREEN}✓${NC} Environnement virtuel déjà configuré"
 else
-    echo -e "${RED}✗${NC} Erreur lors de l'installation des dépendances"
-    exit 1
+    uv sync
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} Dépendances installées avec succès"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de l'installation des dépendances"
+        exit 1
+    fi
 fi
 cd ..
 
