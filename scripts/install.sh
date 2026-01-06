@@ -18,6 +18,25 @@ echo -e "${BLUE}   Base de données Carte Grise${NC}"
 echo -e "${BLUE}========================================${NC}\n"
 
 # ============================================
+# 0. Vérifier et installer uv si nécessaire
+# ============================================
+echo -e "${YELLOW}[0/6]${NC} Vérification de uv..."
+if ! command -v uv &> /dev/null; then
+    echo -e "${YELLOW}uv n'est pas installé. Installation en cours...${NC}"
+    curl -LsSf https://astral.sh/uv/install.sh | sh
+    if [ $? -eq 0 ]; then
+        echo -e "${GREEN}✓${NC} uv installé avec succès"
+        # Recharger le PATH pour que uv soit disponible
+        export PATH="$HOME/.local/bin:$PATH"
+    else
+        echo -e "${RED}✗${NC} Erreur lors de l'installation de uv"
+        exit 1
+    fi
+else
+    echo -e "${GREEN}✓${NC} uv est déjà installé"
+fi
+
+# ============================================
 # 1. Créer la base de données
 # ============================================
 echo -e "${YELLOW}[1/6]${NC} Création de la base de données..."
