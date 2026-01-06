@@ -18,7 +18,16 @@ echo -e "${BLUE}========================================${NC}\n"
 
 cd "$(dirname "$0")/../carte_grise_app"
 
-echo -e "${YELLOW}Exécution des migrations Django...${NC}\n"
+# Vérifier s'il y a des migrations en attente
+echo -e "${YELLOW}Vérification des migrations en attente...${NC}"
+pending_migrations=$(uv run python manage.py showmigrations --plan 2>/dev/null | grep -c "\[ \]" || echo "0")
+
+if [ "$pending_migrations" -eq 0 ]; then
+    echo -e "${GREEN}✓${NC} Aucune migration en attente, base de données à jour\n"
+    exit 0
+fi
+
+echo -e "${YELLOW}$pending_migrations migration(s) en attente. Exécution...${NC}\n"
 
 uv run python manage.py migrate
 
