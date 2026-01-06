@@ -73,34 +73,34 @@ L'application permet de gérer l'ensemble du cycle de vie des cartes grises :
 
 #### Étape 1-4 : Base de données
 
-1. ✅ Conception du MCD
-2. ✅ Création des tables SQL
-3. ✅ Insertion de données de test conformes
-4. ✅ Contraintes d'intégrité et triggers
+1. OK Conception du MCD
+2. OK Création des tables SQL
+3. OK Insertion de données de test conformes
+4. OK Contraintes d'intégrité et triggers
 
 #### Étape 5-6 : Application Django
 
-5. ✅ Configuration Django avec MySQL
-6. ✅ Modèles Django (ORM)
-7. ✅ Interface d'administration
+5. OK Configuration Django avec MySQL
+6. OK Modèles Django (ORM)
+7. OK Interface d'administration
 
 #### Étape 7-9 : Consultation & Statistiques
 
-8. ✅ **a.** Lister cartes grises par laps de temps
-9. ✅ **b.** Lister par nom/prénom (ordre alphabétique)
-10. ✅ **c.** Lister par numéro de plaque (filtres avancés)
-11. ✅ **d.** Statistiques des marques par ordre décroissant
-12. ✅ **e.** Véhicules > X années + émission CO2 > Y g/km
+8. OK **a.** Lister cartes grises par laps de temps
+9. OK **b.** Lister par nom/prénom (ordre alphabétique)
+10. OK **c.** Lister par numéro de plaque (filtres avancés)
+11. OK **d.** Statistiques des marques par ordre décroissant
+12. OK **e.** Véhicules > X années + émission CO2 > Y g/km
 
 ### 2.3 Répartition des tâches
 
-| Membre      | Tâches                | Pourcentage |
-| ----------- | --------------------- | ----------- |
-| Johan Polsinelli | étapes de 1-4 | 50%        |
-| Iryna Bastryha | le reste des étapes (1/8) | 12.5%        |
-| Rafael Eck | le reste des étapes (1/8) | 12.5%        |
-| Anthony Deblieux | le reste des étapes (1/8) | 12.5%        |
-| Alexandru Zupcau | le reste des étapes (1/8) | 12.5%        |
+| Membre           | Tâches                    | Pourcentage |
+| ---------------- | ------------------------- | ----------- |
+| Johan Polsinelli | étapes principales        | 50%         |
+| Iryna Bastryha   | le reste des étapes (1/8) | 12.5%       |
+| Rafael Eck       | le reste des étapes (1/8) | 12.5%       |
+| Anthony Deblieux | le reste des étapes (1/8) | 12.5%       |
+| Alexandru Zupcau | le reste des étapes (1/8) | 12.5%       |
 
 **Détail du travail accompli** :
 
@@ -346,16 +346,16 @@ Carte_Grise (1,*) ──> Controle_Technique
 
 #### 3.2.2 Normalisation (3NF)
 
-**1ère Forme Normale (1NF)** ✅
+**1ère Forme Normale (1NF)** OK
 
 - Toutes les colonnes sont atomiques
 - Pas de groupes répétitifs
 
-**2ème Forme Normale (2NF)** ✅
+**2ème Forme Normale (2NF)** OK
 
 - Tous les attributs non-clés dépendent de la clé primaire complète
 
-**3ème Forme Normale (3NF)** ✅
+**3ème Forme Normale (3NF)** OK
 
 - Aucune dépendance transitive
 - Tables de référence pour éliminer les redondances
@@ -364,7 +364,7 @@ Carte_Grise (1,*) ──> Controle_Technique
 
 ```
 ❌ AVANT : Vehicule (marque VARCHAR, fabricant VARCHAR, categorie VARCHAR)
-✅ APRÈS : Vehicule (id_marque FK, id_fabricant FK, id_categorie_modele FK)
+OK APRÈS : Vehicule (id_marque FK, id_fabricant FK, id_categorie_modele FK)
 ```
 
 **Avantages** :
@@ -380,8 +380,8 @@ Carte_Grise (1,*) ──> Controle_Technique
 
 **Livrables** :
 
-- ✅ `MCD.jpg` : Modèle Conceptuel de Données
-- ✅ `sql/create_tables.sql` : Script de création (235 lignes)
+- OK `MCD.jpg` : Modèle Conceptuel de Données
+- OK `sql/create_tables.sql` : Script de création (235 lignes)
 
 **Choix techniques** :
 
@@ -412,7 +412,7 @@ END;
 
 **Livrables** :
 
-- ✅ `sql/insert_data.sql` : Données de test conformes
+- OK `sql/insert_data.sql` : Données de test conformes
 
 **Données générées** :
 
@@ -429,10 +429,10 @@ END;
 
 **Conformité** :
 
-- ✅ Dates de fabrication : 2020-2025
-- ✅ Formats validés (REGEX)
-- ✅ Numéros uniques et auto-incrémentés
-- ✅ Respect des contraintes FK
+- OK Dates de fabrication : 2020-2025
+- OK Formats validés (REGEX)
+- OK Numéros uniques et auto-incrémentés
+- OK Respect des contraintes FK
 
 #### Étape 5-6 : Application Django
 
@@ -796,10 +796,10 @@ class TestUtils(TestCase):
 
 **Couverture** :
 
-- ✅ Formats de numéros
-- ✅ Unicité
-- ✅ Incrémentation
-- ✅ Validation des données
+- OK Formats de numéros
+- OK Unicité
+- OK Incrémentation
+- OK Validation des données
 
 #### 3.4.3 Tests backend Django
 
@@ -881,10 +881,10 @@ Menu interactif:
 **Résultat complet** :
 
 ```
-✓ Test de conformité      : 16/16 vérifications
-✓ Test d'incrémentation   : 3/3 vérifications
-✓ Tests Python unitaires  : 27/27 tests
-✓ Tests Backend Django    : 16/16 tests
+OK Test de conformité      : 16/16 vérifications
+OK Test d'incrémentation   : 3/3 vérifications
+OK Tests Python unitaires  : 27/27 tests
+OK Tests Backend Django    : 16/16 tests
 ==========================================
 TOTAL: 62 vérifications | 100% de réussite
 ```
@@ -899,15 +899,15 @@ TOTAL: 62 vérifications | 100% de réussite
 
 | Étape | Description          | Statut  | Détails                     |
 | ----- | -------------------- | ------- | --------------------------- |
-| 1-2   | Conception BD        | ✅ 100% | MCD + create_tables.sql     |
-| 3-4   | Données de test      | ✅ 100% | insert_data.sql conforme    |
-| 5-6   | Application Django   | ✅ 100% | ORM + Admin + Templates     |
-| 7a    | Filtre par date      | ✅ 100% | date_debut + date_fin       |
-| 7b    | Recherche nom/prénom | ✅ 100% | Tri alphabétique            |
-| 7c    | Filtres plaque       | ✅ 100% | 3 filtres combinables       |
-| 8d    | Stats marques        | ✅ 100% | Tri décroissant + %         |
-| 9e    | Véhicules anciens    | ✅ 100% | Âge + CO2 combinés          |
-| Tests | Couverture complète  | ✅ 100% | 43 tests (62 vérifications) |
+| 1-2   | Conception BD        | OK 100% | MCD + create_tables.sql     |
+| 3-4   | Données de test      | OK 100% | insert_data.sql conforme    |
+| 5-6   | Application Django   | OK 100% | ORM + Admin + Templates     |
+| 7a    | Filtre par date      | OK 100% | date_debut + date_fin       |
+| 7b    | Recherche nom/prénom | OK 100% | Tri alphabétique            |
+| 7c    | Filtres plaque       | OK 100% | 3 filtres combinables       |
+| 8d    | Stats marques        | OK 100% | Tri décroissant + %         |
+| 9e    | Véhicules anciens    | OK 100% | Âge + CO2 combinés          |
+| Tests | Couverture complète  | OK 100% | 43 tests (62 vérifications) |
 
 #### Statistiques du projet
 
@@ -952,16 +952,16 @@ cloc .
 
 **Caractéristiques** :
 
-- ✅ Design responsive (mobile, tablette, desktop)
-- ✅ Filtres dynamiques avec auto-uppercase
-- ✅ Tri personnalisable
-- ✅ Pagination
-- ✅ Messages de feedback utilisateur
-- ✅ Graphiques visuels
+- OK Design responsive (mobile, tablette, desktop)
+- OK Filtres dynamiques avec auto-uppercase
+- OK Tri personnalisable
+- OK Pagination
+- OK Messages de feedback utilisateur
+- OK Graphiques visuels
 
 ### 4.2 Travail restant à faire
 
-#### 🔄 Améliorations possibles (optionnelles)
+#### Améliorations possibles (optionnelles)
 
 **Fonctionnalités avancées** :
 
@@ -998,13 +998,13 @@ cloc .
 
 | Objectif          | Statut | Commentaire                            |
 | ----------------- | ------ | -------------------------------------- |
-| Modélisation BD   | ✅     | MCD en 3NF, schéma relationnel complet |
-| SQL avancé        | ✅     | Triggers, CHECK, FK, REGEX             |
-| ORM Django        | ✅     | 10 modèles, managed=False              |
-| Développement web | ✅     | Interface complète et responsive       |
-| Tests             | ✅     | 43 tests, 100% de réussite             |
-| Documentation     | ✅     | README, RAPPORT, COMPARAISON_MCD_SQL   |
-| Organisation      | ✅     | Structure professionnelle du projet    |
+| Modélisation BD   | OK     | MCD en 3NF, schéma relationnel complet |
+| SQL avancé        | OK     | Triggers, CHECK, FK, REGEX             |
+| ORM Django        | OK     | 10 modèles, managed=False              |
+| Développement web | OK     | Interface complète et responsive       |
+| Tests             | OK     | 43 tests, 100% de réussite             |
+| Documentation     | OK     | README, RAPPORT, COMPARAISON_MCD_SQL   |
+| Organisation      | OK     | Structure professionnelle du projet    |
 
 #### Compétences acquises
 
@@ -1125,11 +1125,11 @@ Ce projet SAE 1.04 a permis de concevoir et développer une **application compl�
 
 **Réalisations principales** :
 
-- ✅ Base de données MySQL normalisée (3NF) avec 10 tables
-- ✅ Application web Django avec interface responsive
-- ✅ 5 fonctionnalités de consultation/statistiques
-- ✅ 43 tests automatisés (100% de réussite)
-- ✅ Documentation technique complète
+- OK Base de données MySQL normalisée (3NF) avec 10 tables
+- OK Application web Django avec interface responsive
+- OK 5 fonctionnalités de consultation/statistiques
+- OK 43 tests automatisés (100% de réussite)
+- OK Documentation technique complète
 
 **Chiffres clés** :
 
@@ -1169,14 +1169,6 @@ Ce projet SAE 1.04 a permis de concevoir et développer une **application compl�
 
 ### 5.3 Perspectives
 
-**Application concrète** :
-Ce projet peut servir de base pour :
-
-- Gestion réelle de cartes grises (administration, garage)
-- Outil d'apprentissage pour les bases de données
-- Portfolio professionnel
-- Base pour d'autres projets similaires
-
 **Évolutions possibles** :
 
 - API REST pour intégration avec d'autres systèmes
@@ -1184,16 +1176,6 @@ Ce projet peut servir de base pour :
 - Module de facturation
 - Gestion des assurances
 - Historique complet du véhicule
-
-### 5.4 Remerciements
-
-Je remercie l'équipe pédagogique pour :
-
-- Le cahier des charges précis et formateur
-- L'accompagnement tout au long du projet
-- Les retours constructifs
-
-Ce projet a été une excellente opportunité de mettre en pratique les connaissances acquises en conception de bases de données et développement web.
 
 ---
 
@@ -1235,9 +1217,7 @@ Ce projet a été une excellente opportunité de mettre en pratique les connaiss
 
 **Documentation** :
 
-- README.md
 - RAPPORT.md
-- COMPARAISON_MCD_SQL.md
 
 ### 6.3 Évaluation de la qualité
 
@@ -1285,9 +1265,7 @@ Ce projet a été une excellente opportunité de mettre en pratique les connaiss
 SAE DB/
 ├── all.sh                      # Point d'entrée principal
 ├── MCD.jpg                     # Schéma conceptuel
-├── README.md                   # Documentation utilisateur
 ├── RAPPORT.md                  # Ce rapport
-├── COMPARAISON_MCD_SQL.md      # Analyse de cohérence
 │
 ├── carte_grise_app/            # Application Django
 │   ├── cartes_grises/
