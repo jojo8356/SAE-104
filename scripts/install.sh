@@ -66,22 +66,21 @@ else
 fi
 
 # ============================================
-# 2. Vérifier et installer uv si nécessaire
+# 2. Vérifier et installer python3-venv si nécessaire
 # ============================================
-echo -e "${YELLOW}[2/9]${NC} Vérification de uv..."
-# Ajouter le chemin de uv au PATH pour cette session
-export PATH="$HOME/.local/bin:$PATH"
-if ! command -v uv &> /dev/null; then
-    echo -e "${YELLOW}uv n'est pas installé. Installation via pip...${NC}"
-    pip3 install uv || pip install uv
+echo -e "${YELLOW}[2/9]${NC} Vérification de python3-venv..."
+if ! dpkg -l | grep -q "python3-venv"; then
+    echo -e "${YELLOW}python3-venv n'est pas installé. Installation en cours...${NC}"
+    apt_update_once
+    sudo apt-get install -y python3-venv python3-full
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓${NC} uv installé avec succès"
+        echo -e "${GREEN}✓${NC} python3-venv installé avec succès"
     else
-        echo -e "${RED}✗${NC} Erreur lors de l'installation de uv"
+        echo -e "${RED}✗${NC} Erreur lors de l'installation de python3-venv"
         exit 1
     fi
 else
-    echo -e "${GREEN}✓${NC} uv est déjà installé"
+    echo -e "${GREEN}✓${NC} python3-venv est déjà installé"
 fi
 
 # ============================================
@@ -245,20 +244,31 @@ fi
 # ============================================
 # 8. Installer les dépendances Python
 # ============================================
-echo -e "\n${YELLOW}[8/9]${NC} Installation des dépendances Python avec uv..."
+echo -e "\n${YELLOW}[8/9]${NC} Installation des dépendances Python avec venv..."
 cd "$(dirname "$0")/../carte_grise_app"
-# Vérifier si le venv existe déjà et si les dépendances sont installées
-if [ -d ".venv" ] && [ -f ".venv/pyvenv.cfg" ]; then
-    echo -e "${GREEN}✓${NC} Environnement virtuel déjà configuré"
-else
-    uv sync
-    if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✓${NC} Dépendances installées avec succès"
-    else
-        echo -e "${RED}✗${NC} Erreur lors de l'installation des dépendances"
-        exit 1
-    fi
+
+# Créer le venv s'il n'existe pas
+if [ ! -d ".venv" ]; then
+    echo -e "${YELLOW}Création de l'environnement virtuel...${NC}"
+    python3 -m venv .venv
 fi
+
+# Activer le venv et installer les dépendances
+source .venv/bin/activate
+pip install --upgrade pip
+
+# Installer les dépendances
+pip install django pymysql python-dotenv selenium
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✓${NC} Dépendances installées avec succès"
+else
+    echo -e "${RED}✗${NC} Erreur lors de l'installation des dépendances"
+    deactivate
+    exit 1
+fi
+
+deactivate
 cd ..
 
 # ============================================
@@ -284,4 +294,8 @@ echo -e "\n${BLUE}Base de données :${NC} carte_grise_db"
 echo -e "${BLUE}Utilisateur MySQL :${NC} django_user"
 echo -e "${BLUE}Mot de passe :${NC} django_password"
 echo -e "\n${YELLOW}Pour lancer l'application Django :${NC}"
-echo -e "  ./run.sh\n"
+echo -e "  cd carte_grise_app"
+echo -e "  source .venv/bin/activate"
+echo -e "  python manage.py runserver"
+echo -e "\n${YELLOW}Ou utilisez le script :${NC}"
+echo -e "  ./scripts/run.sh\n"

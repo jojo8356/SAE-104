@@ -35,6 +35,10 @@ Documentation complète ligne par ligne de tous les fichiers du projet.
 - [test_utils.py](#carte_grise_apptest_utilspy) - Script de test manuel des utilitaires
 - [test_setup.py](#carte_grise_appcartes_grisestest_setuppy) - Configuration des tests
 
+### Configuration
+- [.env](#carte_grise_appenv) - Variables d'environnement (base de données)
+- [settings.py](#carte_grise_appconfigsettingspy) - Configuration Django
+
 ### Référence rapide
 - [Commandes Bash utiles](#commandes-bash-utiles)
 - [Commandes Django utiles](#commandes-django-utiles)
@@ -66,7 +70,7 @@ NC='\033[0m'
 ```bash
 APT_UPDATED=false
 ```
-> Variable qui permet de savoir si on a déjà fait `apt-get update` pour éviter de le refaire plusieurs fois.
+> Variable globale qui permet de savoir si on a déjà fait `apt-get update` pour éviter de le refaire plusieurs fois (optimisation de performance).
 
 ```bash
 apt_update_once() {
@@ -100,9 +104,9 @@ export PATH="$HOME/.local/bin:$PATH"
 > Ajoute le dossier `~/.local/bin` au PATH pour que les commandes installées par pip soient trouvées.
 
 ```bash
-pip3 install uv || pip install uv
+python3 -m venv .venv
 ```
-> Essaie d'installer `uv` avec pip3, et si ça échoue, essaie avec pip.
+> Crée un environnement virtuel Python standard dans le dossier `.venv`. Utilise le module venv intégré à Python.
 
 ```bash
 get_mariadb_version() {
@@ -141,6 +145,12 @@ if [ -d ".venv" ] && [ -f ".venv/pyvenv.cfg" ]; then
 ```
 > Vérifie si l'environnement virtuel Python existe déjà (dossier .venv avec son fichier de config).
 
+```bash
+source .venv/bin/activate
+pip install django pymysql python-dotenv selenium
+```
+> Active l'environnement virtuel et installe les dépendances Python nécessaires au projet.
+
 ---
 
 ## scripts/run.sh
@@ -150,27 +160,33 @@ if [ -d ".venv" ] && [ -f ".venv/pyvenv.cfg" ]; then
 ### Fonctionnement ligne par ligne
 
 ```bash
-cd carte_grise_app
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR/../carte_grise_app"
 ```
-> Se déplace dans le dossier de l'application Django.
+> Récupère le chemin absolu du script et se déplace dans le dossier de l'application Django. `BASH_SOURCE[0]` donne le chemin du script en cours d'exécution.
+
+```bash
+source .venv/bin/activate
+```
+> Active l'environnement virtuel Python. `source` exécute le script d'activation dans le shell courant.
 
 ```bash
 printf "\n${BLUE}========================================${NC}"
-printf "${BLUE}   Serveur Django démarré !${NC}"
-printf "${BLUE}   URL: http://127.0.0.1:8000${NC}"
+printf "\n${BLUE}   Serveur Django démarré !${NC}"
+printf "\n${BLUE}   URL: http://127.0.0.1:8000${NC}"
 ```
 > Affiche un message indiquant que le serveur démarre avec l'URL d'accès.
 
 ```bash
-uv run python manage.py runserver
+python manage.py runserver
 ```
-> Lance le serveur Django via `uv`. `uv run` exécute la commande dans l'environnement virtuel géré par uv.
+> Lance le serveur Django de développement. L'environnement virtuel étant activé, `python` utilise automatiquement le bon interpréteur.
 
 ---
 
 ## scripts/migrate.sh
 
-**Fonction** : Applique les migrations Django à la base de données (si nécessaire).
+**Fonction** : Applique les migrations Django à la base de données (seulement si nécessaire).
 
 ### Fonctionnement ligne par ligne
 
@@ -182,7 +198,7 @@ cd "$(dirname "$0")/../carte_grise_app"
 ```bash
 pending_migrations=$(uv run python manage.py showmigrations --plan 2>/dev/null | grep -c "\[ \]" || echo "0")
 ```
-> Compte les migrations non appliquées. `showmigrations --plan` liste toutes les migrations, `[ ]` indique une migration en attente.
+> Compte les migrations non appliquées. `showmigrations --plan` liste toutes les migrations, `[ ]` indique une migration en attente. Cette vérification préalable évite d'exécuter inutilement la commande migrate.
 
 ```bash
 if [ "$pending_migrations" -eq 0 ]; then
@@ -190,7 +206,7 @@ if [ "$pending_migrations" -eq 0 ]; then
     exit 0
 fi
 ```
-> Si aucune migration n'est en attente, on affiche un message et on quitte immédiatement (gain de temps).
+> Si aucune migration n'est en attente, on affiche un message et on quitte immédiatement (optimisation de temps).
 
 ```bash
 uv run python manage.py migrate
@@ -513,7 +529,7 @@ def valider_format_numero_carte_grise(numero):
 
 ## carte_grise_app/cartes_grises/templates/cartes_grises/base.html
 
-**Fonction** : Template de base dont héritent toutes les pages.
+**Fonction** : Template de base dont héritent toutes les pages. Inclut une navigation responsive avec menu mobile.
 
 ### Fonctionnement ligne par ligne
 
@@ -528,26 +544,67 @@ def valider_format_numero_carte_grise(numero):
 > Bloc Django que les templates enfants peuvent remplacer pour personnaliser le titre.
 
 ```html
+<!-- Menu desktop -->
 <div class="hidden md:block">
 ```
-> Classes Tailwind : `hidden` cache l'élément, `md:block` l'affiche sur écrans moyens et plus.
+> Classes Tailwind : `hidden` cache l'élément, `md:block` l'affiche sur écrans moyens et plus (≥768px).
 
 ```html
 <a href="{% url 'index' %}" class="...">
 ```
 > `{% url 'index' %}` génère l'URL correspondant au nom 'index' défini dans urls.py.
 
-```html
-<button id="mobile-menu-button" aria-controls="mobile-menu" aria-expanded="false">
-```
-> Bouton hamburger avec attributs d'accessibilité ARIA.
+### Menu mobile responsive
 
 ```html
-document.getElementById('mobile-menu-button').addEventListener('click', function() {
-    mobileMenu.classList.toggle('hidden');
-});
+<!-- Bouton hamburger mobile -->
+<div class="md:hidden">
+    <button type="button" id="mobile-menu-button"
+            class="..."
+            aria-controls="mobile-menu"
+            aria-expanded="false">
+        <i class="fas fa-bars text-xl" id="menu-icon-open"></i>
+        <i class="fas fa-times text-xl hidden" id="menu-icon-close"></i>
+    </button>
+</div>
 ```
-> JavaScript qui bascule la classe 'hidden' pour afficher/masquer le menu mobile.
+> Bouton hamburger visible uniquement sur mobile (`md:hidden`). Contient deux icônes : hamburger (☰) et croix (✕). Les attributs ARIA améliorent l'accessibilité.
+
+```html
+<!-- Menu mobile (caché par défaut) -->
+<div class="hidden md:hidden" id="mobile-menu">
+    <div class="space-y-1 px-2 pb-3 pt-2">
+        <a href="{% url 'index' %}" class="... block ...">
+            <i class="fas fa-home mr-2"></i> Accueil
+        </a>
+        <!-- Autres liens... -->
+    </div>
+</div>
+```
+> Menu déroulant mobile, caché par défaut. `block` affiche les liens en colonne. Chaque lien a une icône Font Awesome.
+
+```html
+<script>
+document.getElementById('mobile-menu-button').addEventListener('click', function() {
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+
+    mobileMenu.classList.toggle('hidden');
+    iconOpen.classList.toggle('hidden');
+    iconClose.classList.toggle('hidden');
+
+    const isExpanded = !mobileMenu.classList.contains('hidden');
+    this.setAttribute('aria-expanded', isExpanded);
+});
+</script>
+```
+> JavaScript qui gère l'ouverture/fermeture du menu mobile :
+> - `classList.toggle('hidden')` bascule la visibilité
+> - Alterne entre l'icône hamburger et croix
+> - Met à jour `aria-expanded` pour l'accessibilité
+
+### Messages flash Django
 
 ```html
 {% if messages %}
@@ -1007,15 +1064,92 @@ class BaseTestCase(TestCase):
 
 ---
 
+## carte_grise_app/.env
+
+**Fonction** : Fichier de configuration des variables d'environnement pour la connexion à la base de données.
+
+### Fonctionnement ligne par ligne
+
+```bash
+DB_HOST=linserv-info-01.campus.unice.fr
+```
+> Adresse du serveur MySQL de l'université.
+
+```bash
+DB_PORT=3306
+```
+> Port standard de MySQL/MariaDB.
+
+```bash
+DB_NAME=pj509414_cartes_grises
+```
+> Nom de la base de données sur le serveur de l'université.
+
+```bash
+DB_USER=pj509414
+```
+> Identifiant de connexion à la base de données.
+
+```bash
+DB_PASSWORD=xxxxx
+```
+> Mot de passe de connexion (ne jamais commiter ce fichier avec le vrai mot de passe).
+
+### Sécurité
+
+Le fichier `.env` ne doit **jamais** être versionné (ajouté dans `.gitignore`). Il contient des informations sensibles.
+
+---
+
+## carte_grise_app/config/settings.py
+
+**Fonction** : Configuration principale de Django, incluant la connexion à la base de données.
+
+### Fonctionnement ligne par ligne (section base de données)
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+```
+> Charge les variables d'environnement depuis le fichier `.env`. La bibliothèque `python-dotenv` lit le fichier et rend les variables accessibles via `os.environ`.
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': os.environ.get('DB_NAME', 'pj509414_cartes_grises'),
+        'USER': os.environ.get('DB_USER', 'pj509414'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', 'linserv-info-01.campus.unice.fr'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
+    }
+}
+```
+> Configuration de la base de données. `os.environ.get('VAR', 'default')` récupère la variable d'environnement ou utilise la valeur par défaut si elle n'existe pas.
+
+### Avantages de cette approche
+
+| Avantage | Description |
+|----------|-------------|
+| Sécurité | Les mots de passe ne sont pas dans le code source |
+| Flexibilité | Facile de changer d'environnement (local/université) |
+| Portabilité | Chaque développeur peut avoir sa propre configuration |
+
+---
+
 ## Commandes de test utiles
 
 | Commande | Description |
 |----------|-------------|
 | `./scripts/test.sh` | Lance le menu interactif de tests |
-| `uv run python manage.py test cartes_grises` | Tous les tests Python |
-| `uv run python manage.py test cartes_grises.tests` | Tests de génération de numéros |
-| `uv run python manage.py test cartes_grises.test_views` | Tests des vues |
-| `uv run python manage.py test cartes_grises --verbosity=2` | Mode verbose |
-| `uv run python manage.py test cartes_grises.tests.GenerationNumeroCarteGriseTestCase` | Une classe de test |
-| `uv run python manage.py test cartes_grises.tests.GenerationNumeroCarteGriseTestCase.test_premier_numero_annee` | Un test spécifique |
-| `uv run python test_utils.py` | Tests manuels des utilitaires |
+| `python manage.py test cartes_grises` | Tous les tests Python |
+| `python manage.py test cartes_grises.tests` | Tests de génération de numéros |
+| `python manage.py test cartes_grises.test_views` | Tests des vues |
+| `python manage.py test cartes_grises --verbosity=2` | Mode verbose |
+| `python manage.py test cartes_grises.tests.GenerationNumeroCarteGriseTestCase` | Une classe de test |
+| `python manage.py test cartes_grises.tests.GenerationNumeroCarteGriseTestCase.test_premier_numero_annee` | Un test spécifique |
+| `python test_utils.py` | Tests manuels des utilitaires |
+
+> **Note** : Exécuter ces commandes après avoir activé l'environnement virtuel : `source .venv/bin/activate`

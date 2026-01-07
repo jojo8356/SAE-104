@@ -11,6 +11,11 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+# Charger les variables d'environnement depuis .env
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -72,15 +77,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# Configuration pour la base de données MySQL de l'université (linserv-info-01)
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'carte_grise_db',
-        'USER': 'django_user',  # Utilisateur créé par run.sh
-        'PASSWORD': 'django_password',  # Mot de passe défini dans run.sh
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.environ.get('DB_NAME', 'pj509414_cartes_grises'),
+        'USER': os.environ.get('DB_USER', 'pj509414'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),  # À définir via variable d'environnement
+        'HOST': os.environ.get('DB_HOST', 'linserv-info-01.campus.unice.fr'),
+        'PORT': os.environ.get('DB_PORT', '3306'),
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4',
